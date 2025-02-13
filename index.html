@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6-maktab - Rasmiy veb-sayt</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" rel="stylesheet">
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #f0f4f8;
+            --accent-color: #fbbf24;
+            --text-color: #333333;
+            --light-text-color: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--light-text-color);
+            padding: 20px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav ul {
+            list-style-type: none;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        nav ul li {
+            margin: 0 15px;
+        }
+
+        nav ul li a {
+            color: var(--light-text-color);
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: var(--accent-color);
+        }
+
+        main {
+            margin-top: 80px;
+        }
+
+        section {
+            padding: 60px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .hero {
+            background-image: url('https://images.unsplash.com/photo-1497633762265-9d179a990aa6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--light-text-color);
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: var(--light-text-color);
+        }
+
+        .hero p {
+            font-size: 1.5em;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .news-item {
+            background: var(--secondary-color);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .news-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .news-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .news-content {
+            padding: 20px;
+        }
+
+        .schedule {
+            background-color: var(--secondary-color);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .schedule-day {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            height: 250px;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .contact-form {
+            background-color: var(--secondary-color);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 5px;
+        }
+
+        .contact-form button {
+            background-color: var(--primary-color);
+            color: var(--light-text-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .contact-form button:hover {
+            background-color: #1c3366;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: var(--light-text-color);
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 60px;
+        }
+
+        .animate-fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .animate-fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #calendar {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-day {
+            text-align: center;
+            padding: 10px;
+            background-color: var(--secondary-color);
+            border-radius: 5px;
+        }
+
+        .calendar-day.today {
+            background-color: var(--accent-color);
+            font-weight: bold;
+            color: var(--light-text-color);
+        }
+
+        .feature-icons {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .feature-icon {
+            text-align: center;
+            margin: 20px;
+        }
+
+        .feature-icon i {
+            font-size: 2.5em;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        #map {
+            height: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .social-icons {
+            margin-top: 20px;
+        }
+
+        .social-icons a {
+            color: var(--light-text-color);
+            font-size: 1.5em;
+            margin: 0 10px;
+            transition: color 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <header id="header">
+        <div class="container">
+            <nav>
+                <ul>
+                    <li><a href="#home">Bosh sahifa</a></li>
+                    <li><a href="#news">Yangiliklar</a></li>
+                    <li><a href="#schedule">Jadval</a></li>
+                    <li><a href="#gallery">Galereya</a></li>
+                    <li><a href="#features">Xizmatlar</a></li>
+                    <li><a href="#calendar">Taqvim</a></li>
+                    <li><a href="#location">Manzil</a></li>
+                    <li><a href="#contact">Aloqa</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <h1>6-maktabga xush kelibsiz</h1>
+                <p>Bilim - muvaffaqiyat kaliti</p>
+            </div>
+        </section>
+
+        <section id="news" class="container">
+            <h2 class="animate-fade-in-up">Yangiliklar</h2>
+            <div class="news-grid">
+                <div class="news-item animate-fade-in-up">
+                    <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Maktab olimpiadasi">
+                    <div class="news-content">
+                        <h3>Maktab olimpiadasi</h3>
+                        <p>Ushbu hafta maktabimizda fan olimpiadasi bo'lib o'tdi. Ko'plab o'quvchilar faol ishtirok etishdi.</p>
+                    </div>
+                </div>
+                <div class="news-item animate-fade-in-up">
+                    <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Yangi o'quv yili">
+                    <div class="news-content">
+                        <h3>Yangi o'quv yili</h3>
+                        <p>Yangi o'quv yili munosabati bilan barcha o'quvchilar va o'qituvchilarni tabriklaymiz!</p>
+                    </div>
+                </div>
+                <div class="news-item animate-fade-in-up">
+                    <img src="https://images.unsplash.com/photo-1526976668912-1a811878dd37?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Sport musobaqalari">
+                    <div class="news-content">
+                        <h3>Sport musobaqalari</h3>
+                        <p>Kelajak hafta maktabimizda sport musobaqalari bo'lib o'tadi. Barcha sinflarga omad tilaymiz!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="schedule" class="container">
+            <h2 class="animate-fade-in-up">Dars jadvali</h2>
+            <div class="schedule">
+                <div class="schedule-grid">
+                    <div class="schedule-day animate-fade-in-up">
+                        <h3>Dushanba</h3>
+                        <ul>
+                            <li>1-dars: 8:30 - 9:15</li>
+                            <li>2-dars: 9:25 - 10:10</li>
+                            <li>3-dars: 10:30 - 11:15</li>
+                            <li>4-dars: 11:35 - 12:20</li>
+                            <li>5-dars: 12:30 - 13:15</li>
+                        </ul>
+                    </div>
+                    <div class="schedule-day animate-fade-in-up">
+                        <h3>Seshanba</h3>
+                        <ul>
+                            <li>1-dars: 8:30 - 9:15</li>
+                            <li>2-dars: 9:25 - 10:10</li>
+                            <li>3-dars: 10:30 - 11:15</li>
+                            <li>4-dars: 11:35 - 12:20</li>
+                            <li>5-dars: 12:30 - 13:15</li>
+                        </ul>
+                    </div>
+                    <div class="schedule-day animate-fade-in-up">
+                        <h3>Chorshanba</h3>
+                        <ul>
+                            <li>1-dars: 8:30 - 9:15</li>
+                            <li>2-dars: 9:25 - 10:10</li>
+                            <li>3-dars: 10:30 - 11:15</li>
+                            <li>4-dars: 11:35 - 12:20</li>
+                            <li>5-dars: 12:30 - 13:15</li>
+                        </ul>
+                    </div>
+                    <div class="schedule-day animate-fade-in-up">
+                        <h3>Payshanba</h3>
+                        <ul>
+                            <li>1-dars: 8:30 - 9:15</li>
+                            <li>2-dars: 9:25 - 10:10</li>
+                            <li>3-dars: 10:30 - 11:15</li>
+                            <li>4-dars: 11:35 - 12:20</li>
+                            <li>5-dars: 12:30 - 13:15</li>
+                        </ul>
+                    </div>
+                    <div class="schedule-day animate-fade-in-up">
+                        <h3>Juma</h3>
+                        <ul>
+                            <li>1-dars: 8:30 - 9:15</li>
+                            <li>2-dars: 9:25 - 10:10</li>
+                            <li>3-dars: 10:30 - 11:15</li>
+                            <li>4-dars: 11:35 - 12:20</li>
+                            <li>5-dars: 12:30 - 13:15</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="gallery" class="container">
+            <h2 class="animate-fade-in-up">Galereya</h2>
+            <div class="gallery">
+                <div class="gallery-item animate-fade-in-up">
+                    <img src="https://images.unsplash.com/photo-1588072432836-e10032774350?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Maktab hayoti 1">
+                </div>
+                <div class="gallery-item animate-fade-in-up">
+                    <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Maktab hayoti 2">
+                </div>
+                <div class="gallery-item animate-fade-in-up">
+                    <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Maktab hayoti 3">
+                </div>
+                <div class="gallery-item animate-fade-in-up">
+                    <img src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Maktab hayoti 4">
+                </div>
+                <div class="gallery-item animate-fade-in-up">
+                    <img src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Maktab hayoti 5">
+                </div>
+                <div class="gallery-item animate-fade-in-up">
+                    <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Maktab hayoti 6">
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="container">
+            <h2 class="animate-fade-in-up">Bizning xizmatlar</h2>
+            <div class="feature-icons">
+                <div class="feature-icon animate-fade-in-up">
+                    <i class="fas fa-book"></i>
+                    <p>Zamonaviy kutubxona</p>
+                </div>
+                <div class="feature-icon animate-fade-in-up">
+                    <i class="fas fa-flask"></i>
+                    <p>Ilg'or laboratoriyalar</p>
+                </div>
+                <div class="feature-icon animate-fade-in-up">
+                    <i class="fas fa-futbol"></i>
+                    <p>Sport maydonchasi</p>
+                </div>
+                <div class="feature-icon animate-fade-in-up">
+                    <i class="fas fa-music"></i>
+                    <p>Musiqa va san'at to'garaklari</p>
+                </div>
+                <div class="feature-icon animate-fade-in-up">
+                    <i class="fas fa-bus"></i>
+                    <p>Maktab transporti</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="calendar" class="container">
+            <h2 class="animate-fade-in-up">Taqvim</h2>
+            <div id="calendar" class="animate-fade-in-up">
+                <div class="calendar-grid" id="calendar-grid"></div>
+            </div>
+        </section>
+
+        <section id="location" class="container">
+            <h2 class="animate-fade-in-up">Bizning manzil</h2>
+            <div id="map" class="animate-fade-in-up"></div>
+        </section>
+
+        <section id="contact" class="container">
+            <h2 class="animate-fade-in-up">Biz bilan bog'laning</h2>
+            <div class="contact-form animate-fade-in-up">
+                <form>
+                    <input type="text" placeholder="Ismingiz" required>
+                    <input type="email" placeholder="Elektron pochtangiz" required>
+                    <textarea placeholder="Xabaringiz" rows="5" required></textarea>
+                    <button type="submit">Yuborish</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 6-maktab. Barcha huquqlar himoyalangan.</p>
+            <div class="social-icons">
+                <a href="#" target="_blank"><i class="fab fa-facebook"></i></a>
+                <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="#" target="_blank"><i class="fab fa-telegram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Animate elements on scroll
+        function animateOnScroll() {
+            const elements = document.querySelectorAll('.animate-fade-in-up');
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                if (elementTop < windowHeight - 50) {
+                    element.classList.add('visible');
+                }
+            });
+        }
+
+        // Generate calendar
+        function generateCalendar() {
+            const calendarGrid = document.getElementById('calendar-grid');
+            const date = new Date();
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const firstDay = new Date(year, month, 1).getDay();
+
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day';
+                calendarGrid.appendChild(emptyDay);
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day';
+                if (i === date.getDate()) {
+                    day.classList.add('today');
+                }
+                day.textContent = i;
+                calendarGrid.appendChild(day);
+            }
+        }
+
+        // Initialize map
+        function initMap() {
+            const map = L.map('map').setView([41.0082, 71.6728], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            L.marker([41.0082, 71.6728]).addTo(map)
+                .bindPopup('6-maktab, Chartak, Namangan, O\'zbekiston')
+                .openPopup();
+        }
+
+        // Add event listeners
+        window.addEventListener('scroll', animateOnScroll);
+        window.addEventListener('load', animateOnScroll);
+        window.addEventListener('load', generateCalendar);
+        window.addEventListener('load', initMap);
+    </script>
+</body>
+</html>
